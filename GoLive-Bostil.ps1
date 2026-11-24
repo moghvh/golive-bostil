@@ -28,7 +28,7 @@ param(
 
     [int]$DebugPort = 9222,
     [int]$TimeoutSec = 45,
-    [string]$ForgeIp = '149.22.81.205',
+    [string]$ForgeIp = '149.22.81.205', #ip forjado, pode ser qualquer ip não brasileiro.
     [switch]$NoPause
 )
 
