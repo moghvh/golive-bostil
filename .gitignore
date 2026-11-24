@@ -1,0 +1,6 @@
+# runtime / local state
+install.log
+*.log
+*.patch-state.json
+*.stockbak
+python-installer.exe
