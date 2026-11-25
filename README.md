@@ -117,8 +117,20 @@ pula o patch quando já está aplicado (SHA bate) e reinjeta os shims.
 
 ## Licença / isenção
 
-Sem garantia. Para pesquisa própria e divulgação responsável, só isso. Cumprir os Termos de Serviço do
-Discord e a lei aplicável é com você.
+Sem garantia. Este projeto é disponibilizado **apenas para fins de pesquisa de segurança e educação**,
+como parte de um processo de divulgação responsável, feito na conta e nas máquinas do próprio autor.
+
+**Use por sua conta e risco.** Rodar esta ferramenta viola os Termos de Serviço do Discord e pode levar
+à suspensão ou ao banimento da sua conta. Você é o único responsável pelo uso que faz dela e por
+cumprir os Termos de Serviço do Discord e toda a legislação que se aplica a você.
+
+O software é fornecido "como está", sem garantia de qualquer tipo. Na máxima extensão permitida por
+lei, o autor não assume **nenhuma responsabilidade** por qualquer dano, perda, ação na conta ou
+consequência jurídica decorrente do uso, mau uso ou distribuição deste software **por você ou por
+terceiros**. Ao baixar, executar ou distribuir, você aceita estes termos e assume total
+responsabilidade pelos seus próprios atos.
+
+Este projeto não é afiliado, autorizado nem endossado pela Discord Inc.
 
 ---
 

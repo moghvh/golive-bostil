@@ -112,8 +112,20 @@ Re-running skips the patch when it's already applied (SHA match) and re-injects 
 
 ## License / disclaimer
 
-No warranty. For my own research and responsible disclosure only. Complying with Discord's Terms of
-Service and applicable law is on you.
+No warranty. This project is provided **for security research and educational purposes only**, as part
+of a responsible-disclosure effort carried out on the author's own account and machines.
+
+**Use at your own risk.** Running this tool violates Discord's Terms of Service and may lead to
+suspension or termination of your account. You are solely responsible for how you use it and for
+complying with Discord's Terms of Service and all laws that apply to you.
+
+The software is provided "as is", without warranty of any kind. To the maximum extent permitted by
+law, the author accepts **no liability** for any damage, loss, account action, or legal consequence
+arising from the use, misuse, or distribution of this software **by you or by any third party**. By
+downloading, running, or distributing it, you accept these terms and assume full responsibility for
+your own actions.
+
+This project is not affiliated with, authorized by, or endorsed by Discord Inc.
 
 ---
 
