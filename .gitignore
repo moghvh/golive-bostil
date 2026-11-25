@@ -4,3 +4,7 @@ install.log
 *.patch-state.json
 *.stockbak
 python-installer.exe
+
+# python
+__pycache__/
+*.pyc
