@@ -1,19 +1,90 @@
-# GoLive-Bostil
+<div id="top">
 
-**Don't know how to set up a VPN or use a proxy? Run one file and you're done.**
+<!-- HEADER -->
+<div align="center">
 
-A single-command PowerShell tool that brings Discord **Go Live** (screen streaming) back in regions
-where Discord gates it off at the voice SFU. In Brazil that block shows up as **Error 2012**
-(`video-stream-receiver-ready-timeout`): audio and the thumbnail work, the video just never starts.
-No VPN, no tunnel.
+# `❯ GoLive-Bostil`
+
+<em>Brings Discord Go Live back in regions where it gates the video off — by running one file.</em>
+
+<!-- BADGES -->
+<img src="https://img.shields.io/badge/PowerShell-5391FE.svg?style=flat&logo=PowerShell&logoColor=white" alt="PowerShell">
+<img src="https://img.shields.io/badge/GNU%20Bash-4EAA25.svg?style=flat&logo=GNU-Bash&logoColor=white" alt="GNU Bash">
+<img src="https://img.shields.io/badge/Python-3776AB.svg?style=flat&logo=Python&logoColor=white" alt="Python">
+<img src="https://img.shields.io/badge/JSON-000000.svg?style=flat&logo=JSON&logoColor=white" alt="JSON">
+<br>
+<img src="https://img.shields.io/badge/Platforms-Windows%20%7C%20Linux-informational?style=flat" alt="Platforms: Windows | Linux">
+<img src="https://img.shields.io/badge/License-no%20warranty-lightgrey?style=flat" alt="No warranty">
+
+</div>
+<br>
+
+> **Don't know how to set up a VPN or use a proxy? Run one file and you're done.**
+
+A single-command tool — **PowerShell on Windows, bash on Linux** — that brings Discord **Go Live**
+(screen streaming) back in regions where Discord gates it off at the voice SFU. In Brazil the block
+shows up as **Error 2012** (`video-stream-receiver-ready-timeout`): audio and the thumbnail work, the
+video just never starts. No VPN, no tunnel.
 
 > **Scope / ethics.** Security-research project, on my **own account and machines**. Running it
 > violates Discord's Terms of Service and can get an account actioned. Use it only on accounts and
 > machines you own, at your own risk — not to evade enforcement against others or to run a service.
 
+**BOTH USERS (the streamer and the watcher) MUST run the script for it to work.** The patch is purely
+client-sided — whoever isn't running it stays regionally blocked by the stock app.
+
 ---
 
-## 🚀 Quick start
+## Table of Contents
+
+- [Overview](#overview)
+- [Project Structure](#project-structure)
+- [Getting Started (Windows)](#getting-started-windows)
+- [Usage](#usage)
+- [Linux](#linux)
+- [How it works](#how-it-works)
+- [License / disclaimer](#license--disclaimer)
+
+---
+
+## Overview
+
+The Go Live region gate trusts an address the **client** supplies (the Voice Gateway `op 1`
+`d.data.address`) instead of the address the server actually **observes** on the wire. Rewrite that
+field to a non-Brazil IP and the gate opens, while the media keeps flowing over the real UDP path.
+This tool does it in one command: it patches the encoder, injects the forge and the play shim, and
+hands control back to you.
+
+Both sides (streamer and watcher) must run it — one-sided leaves the gate shut. The shims are
+session-scoped (a Discord reload clears them); the encoder patch is on-disk. Re-running skips the
+already-applied patch and re-injects the shims.
+
+**Why this works, the validation, packet captures and maintenance:** see
+[`EXPLAINER.en.md`](EXPLAINER.en.md). **Formal vulnerability write-up:** [`DISCLOSURE.md`](DISCLOSURE.md).
+
+---
+
+## Project Structure
+
+```sh
+└── golive-bostil/
+    ├── GoLive-Bostil.ps1   # Windows — PowerShell orchestrator (patch + forge + play shim)
+    ├── GoLive-Bostil.cmd   # Windows — double-click shortcut that calls the .ps1
+    ├── golive-bostil.sh    # Linux   — bash orchestrator (same modes and flow)
+    ├── golive_patch.py     # Linux   — ELF encoder patcher (discord_voice.node)
+    ├── signatures.json     # encoder-patch signatures, per Discord build
+    ├── README.md           # Portuguese version
+    ├── README.en.md        # this file (English)
+    ├── EXPLAINER.md         # how/why it works (PT-BR)
+    ├── EXPLAINER.en.md      # how/why it works (English)
+    └── DISCLOSURE.md        # formal vulnerability write-up (CWE, repro, fix)
+```
+
+---
+
+## Getting Started (Windows)
+
+> **On Linux?** The steps below are for Windows. Jump to the [Linux](#linux) section.
 
 1. Download the repo (**Code → Download ZIP**, or `git clone`) and unzip it.
 2. **Double-click `GoLive-Bostil.cmd`.** Or open PowerShell in the folder and run the command below.
@@ -70,7 +141,7 @@ both join the **same voice channel**, each hits **Screen / Go Live** and starts,
 **other person's live tile** to watch. If Discord restarts, re-run the command — it skips the
 already-applied encoder patch and re-injects the shims.
 
-### Parameters
+### Parameters (Windows)
 
 | Parameter     | Default           | Meaning                                              |
 |---------------|-------------------|------------------------------------------------------|
@@ -80,12 +151,60 @@ already-applied encoder patch and re-injects the shims.
 
 Logs: `%LOCALAPPDATA%\GoLiveBostil\install.log`.
 
-### Requirements
+### Requirements (Windows)
 
 - Windows, with Discord desktop installed under `%LOCALAPPDATA%`.
 - PowerShell. Nothing to install by hand — the script pulls in Python 3 (per-user, silent) if it's
   missing, only to run the binary-patch locator.
 - Both the streamer and the viewer run it (both ends forge).
+
+---
+
+## Linux
+
+The Linux port is a bash script, `golive-bostil.sh`, same four modes and same flow as the Windows
+version (it drives Discord's remote-debugging port over CDP and patches the same `discord_voice.node`,
+only as an ELF binary instead of a PE DLL).
+
+```bash
+bash golive-bostil.sh                 # Forge (default): patch + forge + play shim
+bash golive-bostil.sh --forge-ip 8.8.8.8
+bash golive-bostil.sh --mode Revert   # undo the on-disk encoder patch
+bash golive-bostil.sh --mode Probe    # read-only health check
+```
+
+### Parameters (Linux)
+
+| Flag            | Default           | Meaning                                              |
+|-----------------|-------------------|------------------------------------------------------|
+| `--mode`        | `Forge`           | `Forge` / `Watch` (identical today), `Revert`, `Probe` |
+| `--forge-ip`    | `149.22.81.205`   | Non-Brazil IPv4 written into op 1 `d.data.address`   |
+| `--debug-port`  | `9222`            | Discord remote-debugging port                        |
+| `--timeout`     | `45`              | Seconds to wait for the Discord DevTools target      |
+| `--no-pause`    | —                 | Skip the final prompt (or set env `GOLIVE_NOPAUSE`)  |
+
+Logs: `$XDG_DATA_HOME/GoLiveBostil/install.log` (i.e. `~/.local/share/GoLiveBostil/install.log`).
+
+### Requirements (Linux)
+
+- Linux with Discord desktop — native (deb/tar/AUR), **Flatpak** (`com.discordapp.Discord`), or
+  **Snap**. The script auto-detects all three (stable, PTB, Canary).
+- `python3` (standard library only — the CDP WebSocket client and the binary-patch locator are
+  inline). Unlike Windows, it is **not** auto-installed: if missing, install it
+  (`sudo apt install python3` / `sudo dnf install python3` / `sudo pacman -S python`).
+- Both the streamer and the viewer run it (both ends forge).
+
+### Encoder-patch signatures on Linux
+
+The forge shim and the play shim are OS-independent and work as-is. The **encoder patch**, though,
+relies on byte signatures derived from a specific Windows build (`1.0.9269`). The Linux
+`discord_voice.node` is a different ELF binary with its own byte layout, so those signatures won't
+match a Linux build. Until a Linux signature entry is added to `signatures.json`, the script logs a
+warning and **skips the encoder patch** (the region gate still opens via the forge shim; some
+receivers may fail to decode H265 video). To add one, run `--mode Probe`, re-derive the codec-table
+anchor, the `lea` sites, and the keyframe constants for your build, and append the entry to
+`signatures.json` — same schema, same file for both OSes. See
+[`EXPLAINER.en.md`](EXPLAINER.en.md) for the derivation.
 
 ---
 
@@ -104,9 +223,6 @@ One command, three jobs, then it hands control back to you.
 
 The two shims are session-scoped (a Discord reload clears them); the encoder patch is on-disk.
 Re-running skips the patch when it's already applied (SHA match) and re-injects the shims.
-
-**Why this works, the validation, packet captures and maintenance:** see
-[`EXPLAINER.en.md`](EXPLAINER.en.md). **Formal vulnerability write-up:** [`DISCLOSURE.md`](DISCLOSURE.md).
 
 ---
 
@@ -130,3 +246,9 @@ This project is not affiliated with, authorized by, or endorsed by Discord Inc.
 ---
 
 🇧🇷 Versão em português: [`README.md`](README.md).
+
+<sub>README structure generated with <a href="https://github.com/eli64s/readme-ai">readme-ai</a>; content written by hand.</sub>
+
+<div align="right"><a href="#top">⬆ back to top</a></div>
+
+</div>
