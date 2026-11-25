@@ -11,7 +11,8 @@ em regiões onde ele bloqueia o vídeo no SFU de voz.
 > operar um serviço.
 
 **AMBOS OS USUÁRIOS (tanto quem inicia a live e quem assiste) DEVEM ESTAR USANDO O SCRIPT PRA FUNCIONAR!**
-O patch é puramente client-sided, significa que quem não estiver rodando, ainda vai estar bloqueado regionalmente de acordo com o aplicativo padrão.;
+O patch é puramente client-sided, significa que quem não estiver rodando, ainda vai estar bloqueado regionalmente de acordo com o aplicativo padrão.
+Nota: Só precisa do script o usuário que estiver bloqueado, quem não estiver bloqueado por região consegue assistir ou ser assistido normal com quem estiver com o programa.
 
 **Só não faz bosta se for usar, tmj.**
 
