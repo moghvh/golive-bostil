@@ -196,15 +196,19 @@ Logs: `$XDG_DATA_HOME/GoLiveBostil/install.log` (i.e. `~/.local/share/GoLiveBost
 
 ### Encoder-patch signatures on Linux
 
-The forge shim and the play shim are OS-independent and work as-is. The **encoder patch**, though,
-relies on byte signatures derived from a specific Windows build (`1.0.9269`). The Linux
-`discord_voice.node` is a different ELF binary with its own byte layout, so those signatures won't
-match a Linux build. Until a Linux signature entry is added to `signatures.json`, the script logs a
-warning and **skips the encoder patch** (the region gate still opens via the forge shim; some
-receivers may fail to decode H265 video). To add one, run `--mode Probe`, re-derive the codec-table
-anchor, the `lea` sites, and the keyframe constants for your build, and append the entry to
-`signatures.json` — same schema, same file for both OSes. See
-[`EXPLAINER.en.md`](EXPLAINER.en.md) for the derivation.
+The forge shim and the play shim are OS-independent and work as-is. The **encoder patch** relies on
+byte signatures, and the Linux `discord_voice.node` is a different ELF binary from the Windows PE
+with its own byte layout — so Linux needs its own entries. `signatures.json` ships a **verified entry
+for the native build `app-1.0.171`** (2 `lea` sites; keyframe constant loaded via `mov rax`), tested
+on-device: the patch applies and reverts byte-perfect. For that build the script patches the encoder
+normally.
+
+For a Linux build **without** an entry, the script logs a warning and **skips the encoder patch**
+(the region gate still opens via the forge shim; some receivers may fail to decode H265 video). To
+add one, run `--mode Probe`, re-derive the codec-table anchor, the `lea` sites, and the keyframe
+constants for your build, and append the entry to `signatures.json` keyed by the `app-<version>`
+directory name — same schema, same file for both OSes. See [`EXPLAINER.en.md`](EXPLAINER.en.md) for
+the derivation.
 
 ---
 

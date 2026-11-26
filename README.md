@@ -205,14 +205,18 @@ Logs: `$XDG_DATA_HOME/GoLiveBostil/install.log` (ou seja, `~/.local/share/GoLive
 ### Assinaturas do patch do encoder no Linux
 
 O shim de forge e o shim de play independem de sistema operacional e funcionam como estão. Já o
-**patch do encoder** depende de assinaturas de bytes tiradas de uma build específica do Windows
-(`1.0.9269`). O `discord_voice.node` do Linux é um binário ELF diferente, com layout de bytes
-próprio, então essas assinaturas não batem com uma build Linux. Até alguém adicionar uma entrada
-Linux ao `signatures.json`, o script avisa e **pula o patch do encoder** (o gate de região ainda abre
-pelo shim de forge; alguns receptores podem falhar em decodificar vídeo H265). Para adicionar uma:
-rode `--mode Probe`, re-derive a âncora da tabela de codec, os sítios `lea` e as constantes de
-keyframe da sua build, e acrescente a entrada em `signatures.json` — mesmo schema, mesmo arquivo para
-os dois sistemas. Veja [`EXPLAINER.md`](EXPLAINER.md) para a derivação.
+**patch do encoder** depende de assinaturas de bytes, e o `discord_voice.node` do Linux é um binário
+ELF diferente do PE do Windows, com layout próprio — então o Linux precisa das suas próprias
+entradas. O `signatures.json` já traz uma **entrada verificada para a build nativa `app-1.0.171`**
+(2 sítios `lea`; constante de keyframe carregada via `mov rax`), testada na máquina: o patch aplica e
+reverte byte a byte idêntico. Nessa build o script faz o patch do encoder normalmente.
+
+Para uma build Linux **sem** entrada, o script avisa e **pula o patch do encoder** (o gate de região
+ainda abre pelo shim de forge; alguns receptores podem falhar em decodificar vídeo H265). Para
+adicionar uma: rode `--mode Probe`, re-derive a âncora da tabela de codec, os sítios `lea` e as
+constantes de keyframe da sua build, e acrescente a entrada em `signatures.json` com a chave igual ao
+nome do diretório `app-<versão>` — mesmo schema, mesmo arquivo para os dois sistemas. Veja
+[`EXPLAINER.md`](EXPLAINER.md) para a derivação.
 
 ---
 
